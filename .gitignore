@@ -1,2 +1,3 @@
-escola.db
+bd/__pycache__
+bd/escola.db
 venv
