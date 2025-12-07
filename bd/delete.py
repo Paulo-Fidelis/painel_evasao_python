@@ -2,17 +2,17 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
 
-def DeletarProfessor(email_institucional, senha):
+def DeletarProfessor(id,email_institucional, senha):
   
   with Session(engine) as session:
-    delete = session.query(Professor).filter_by(email_institucional=email_institucional, senha=senha).first()
+    delete = session.query(Professor).filter_by(id=id, email_institucional=email_institucional, senha=senha).first()
     session.delete(delete)
     session.commit()
 
-def DeletarAluno(nome):
+def DeletarAluno(id,nome):
 
   with Session(engine) as session:
-    delete = session.query(Aluno).filter_by(nome = nome).first()
+    delete = session.query(Aluno).filter_by(id=id,nome = nome).first()
     session.delete(delete)
     session.commit()
 
@@ -28,16 +28,16 @@ def DeletarFalta(nome_aluno, data_str):
     session.delete(delete)
     session.commit()
 
-def DeletarMatéria(nome_materia):
+def DeletarMatéria(id,nome_materia):
   
   with Session(engine) as session:
-    delete = session.query(Materia).filter_by(nome_materia = nome_materia).first()
+    delete = session.query(Materia).filter_by(id=id,nome_materia = nome_materia).first()
     session.delete(delete)
     session.commit()
 
-def DeleteTurma(nome_turma):
+def DeleteTurma(id,nome_turma):
 
   with Session(engine) as session:
-    delete = session.query(Turma).filter_by(nome_turma = nome_turma).first()
+    delete = session.query(Turma).filter_by(nome_turma = nome_turma,id=id).first()
     session.delete(delete)
     session.commit()
