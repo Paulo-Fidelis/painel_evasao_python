@@ -124,7 +124,14 @@ def cadastro(cadstro: CadastroUsuario):
     return {"mensagem": "Cadastro realizado com sucesso"}
 
 
-
+@app.post('/registrar-falta')
+def registrar_falta(data: str, nome_aluno: str, nome_materia: str):
+    with Session(engine) as session:
+        auth_aluno = session.query(Aluno).filter(Aluno.nome == nome_aluno).first()
+        if auth_aluno:
+            AdicionarFalta(data, nome_aluno, nome_materia)
+    
+    return {"mensagem": "Falta registrada com sucesso"}
 
 
 @app.get('/minhas-turmas')
