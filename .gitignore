@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-
-bd/escola.db
-escola.db
-
-venv
-
-.env
