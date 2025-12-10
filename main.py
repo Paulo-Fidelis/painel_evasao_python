@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 import os
 import jwt
 from sqlalchemy.orm import Session
-from bd.tabelas_do_bd import engine, Professor 
+from bd.tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
+from bd.inserts import AdicionarTurma, AdicionarProfessorComMatéria, AdicionarAlunoComTurma, AdicionarFalta
 
 load_dotenv()
 
@@ -16,6 +17,13 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI()
+
+class CadastroUsuario(BaseModel):
+    nome: str
+    email: str 
+    senha: str
+    nome_materia: str
+    nome_turma: str
 
 class Login(BaseModel):
     email: str 
@@ -32,16 +40,17 @@ def criar_token_acesso(dados: dict):
 
     return encoded_jwt
 
-def get_usuario_atual(token: Optional[str] = Cookie(None)):
+def get_usuario_atual(access_token: Optional[str] = Cookie(None)):
 
-    if not token:
+    
+    if not access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Não autenticado",
         )
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
 
 
@@ -76,7 +85,8 @@ def login(user: Login, response: Response):
         httponly=True,   
         max_age=1800,    
         samesite="lax",  
-        secure=False     
+        secure=False,
+        path ="/"     
     )
 
     return {"mensagem": "Login realizado com sucesso"}
@@ -86,6 +96,35 @@ def logout(response: Response):
     
     response.delete_cookie(key="access_token")
     return {"mensagem": "Logout realizado"}
+
+
+@app.get("/cadastro")
+def cadastro(cadstro: CadastroUsuario):
+    
+    with Session(engine) as session:
+        turma = session.query(Turma.id).filter(
+            Turma.nome_turma == cadstro.nome_turma
+        )
+        
+        if not turma:
+            AdicionarTurma(cadstro.noome_turma)
+            
+            turma = session.query(Turma.id).filter(
+                Turma.nome_turma == cadstro.nome_turma
+            )
+        
+        AdicionarProfessorComMatéria(
+            nome=cadstro.nome,
+            email_institucional=cadstro.email,
+            senha=cadstro.senha,
+            materia=cadstro.nome_materia,
+            id_turma=turma.first().id  
+        )
+
+    return {"mensagem": "Cadastro realizado com sucesso"}
+
+
+
 
 
 @app.get('/minhas-turmas')
