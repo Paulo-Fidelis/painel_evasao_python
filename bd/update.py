@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
+from .tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
 
 def AtualizarTurma(id_turma, novo_nome_turma):
   with Session(engine) as session:

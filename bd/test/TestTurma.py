@@ -1,11 +1,13 @@
-import pytest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm import sessionmaker
-from tabelas_do_bd import Turma, engine
-from inserts import AdicionarTurma
-from delete import DeleteTurma
-from update import AtualizarTurma
+
+from ..tabelas_do_bd import Turma, engine
+from ..inserts import AdicionarTurma
+from ..delete import DeleteTurma
+from ..update import AtualizarTurma
+
+import pytest
 
 Session = sessionmaker(bind=engine)
 

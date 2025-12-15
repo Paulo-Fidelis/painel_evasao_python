@@ -1,4 +1,5 @@
 sqlalchemy
 fastapi[standard]
 python-dotenv
+pytest
 jwt

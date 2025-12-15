@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
+
+from .tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
 
 def AdicionarTurma(nome_turma):
   

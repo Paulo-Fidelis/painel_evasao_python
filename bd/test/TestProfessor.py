@@ -1,9 +1,11 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
-from tabelas_do_bd import Professor, Materia, Turma, engine
-from inserts import AdicionarProfessorComMatéria
-from update import AtualizarProfessor
-from delete import DeletarProfessor
+
+from ..tabelas_do_bd import Professor, Materia, Turma, engine
+from ..inserts import AdicionarProfessorComMatéria
+from ..update import AtualizarProfessor
+from ..delete import DeletarProfessor
+
 import pytest
     
 Session = sessionmaker(bind=engine)

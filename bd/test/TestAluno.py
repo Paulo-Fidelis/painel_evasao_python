@@ -1,10 +1,12 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm import sessionmaker
-from tabelas_do_bd import Aluno, Turma, engine
-from inserts import AdicionarAlunoComTurma
-from update import AtualizarAluno
-from delete import DeletarAluno
+
+from ..tabelas_do_bd import Aluno, Turma, engine
+from ..inserts import AdicionarAlunoComTurma
+from ..update import AtualizarAluno
+from ..delete import DeletarAluno
+
 import pytest
     
 Session = sessionmaker(bind=engine)
