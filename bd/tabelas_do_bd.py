@@ -79,6 +79,7 @@ class Falta(Base):
     aluno = relationship("Aluno", back_populates="faltas")
     materia = relationship("Materia", back_populates="faltas")
 
+
     def __repr__(self):
         return f"<Falta(id={self.id}, data='{self.data_falta}', id_aluno={self.id_aluno}, id_materia={self.id_materia})>"
     

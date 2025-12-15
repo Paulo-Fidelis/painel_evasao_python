@@ -61,8 +61,26 @@ def Materia_valida(Turma_valida,db_session):
     
     return materia_valida
 
+@pytest.fixture(scope="module")
+def Falta_valida(db_session, Aluno_valido, Materia_valida, Turma_valida):
+    
+    dataValida = datetime.strptime("2025-12-22", "%Y-%m-%d").date()
+    
+    falta_valida = Falta(
+        data_falta = dataValida, 
+        id_turma = Turma_valida.id,
+        id_aluno = Aluno_valido.id,
+        id_materia = Materia_valida.id
+    )
+    
+    db_session.add(falta_valida)
+    db_session.commit()
+    
+    return falta_valida
+    
 
-# Acredito que para Faltas, é né
+
+# Acredito que para Faltas, é necessário adicionar, na função de insert, uma dependência de qtd de faltas.
 
 class TestFalta: 
     
@@ -132,3 +150,71 @@ class TestFalta:
             raise
         
     # Updates test
+    
+    def test_update_Falta_valida(self, db_session,Falta_valida):
+        NovaData = "2025-12-20"
+        AtualizarFalta(Falta_valida.id, NovaData)
+        
+        db_session.expire_all()
+        
+        falta = db_session.query(Falta).filter(Falta.id == Falta_valida.id).first()
+        data = datetime.strptime(NovaData, "%Y-%m-%d").date()
+        
+        assert falta is not None
+        assert falta.id == Falta_valida.id
+        assert falta.data_falta == data
+        
+    @pytest.mark.xfail(reases=ValueError, reason="A data deve está nos limites de um calendário")        
+    def test_update_Falta_data_excedida(self, Falta_valida):
+        
+        dataExcedida = "2025-13-19"
+        
+        try:
+            
+            AtualizarFalta(Falta_valida.id, dataExcedida)
+            
+        except ValueError:
+            
+            raise
+    
+    @pytest.mark.xfail(reases=TypeError, reason="Uma falta precisa de uma data")    
+    def test_update_Falta_sem_data(self, Falta_valida):
+        
+        try:
+            
+            AtualizarFalta(Falta_valida.id, None)
+            
+        except TypeError:
+            
+            raise
+    
+    # delete tests
+    
+    def test_delete_Falta_valida(self, db_session, Falta_valida, Aluno_valido):
+        
+        data = Falta_valida.data_falta.strftime("%Y-%m-%d")
+        
+        DeletarFalta(Aluno_valido.nome, data)
+        
+        falta = db_session.query(Falta).filter(
+            Falta.id == Falta_valida.id,
+            Falta.id_aluno == Aluno_valido.id,
+            Falta.data_falta == Falta_valida.data_falta
+        ).all()
+        
+        assert len(falta) == 0
+        
+    @pytest.mark.xfail(reases=TypeError, reason="Uma falta precisa de uma data")
+    def test_delete_Falta_sem_data(self,  Aluno_valido, Falta_valida):
+        
+        data = Falta_valida.data_falta.strftime("%Y-%m-%d") # Para que a falta seja criada
+        
+        try:
+            
+            DeletarFalta(Aluno_valido.nome, None)        
+            
+        except TypeError:
+            
+            raise
+            
+            

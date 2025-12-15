@@ -22,7 +22,7 @@ def DeletarFalta(nome_aluno, data_str):
   data = datetime.strptime(data_str, "%Y-%m-%d").date()
 
   with Session(engine) as session:
-    aluno = session.query(Aluno).filter(nome = nome_aluno).first()
+    aluno = session.query(Aluno).filter_by(nome = nome_aluno).first()
     delete = session.query(Falta).filter_by(data_falta = data, id_aluno = aluno.id).first()
 
     session.delete(delete)
