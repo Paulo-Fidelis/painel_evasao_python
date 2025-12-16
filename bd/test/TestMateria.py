@@ -53,7 +53,25 @@ def Materia_valida(Turma_valida,db_session):
 class TestMateria: # Materia não tem insert próprio, fiz apenas testes para update e delete
     
     #Updates
+    def test_update_materia_trocar_professor(self, db_session, Materia_valida):
     
+        db_session.expire_all() 
+        
+        professor_novo =  Professor(nome="Rogério", email_institucional="rogerio@professor", senha="123")
+        
+        db_session.add(professor_novo)
+        db_session.commit()
+        
+        AtualizarMateria(Materia_valida.id, Materia_valida.nome_materia, professor_novo.id)
+        
+            
+        db_session.expire_all() 
+        
+        materia = db_session.query(Materia).filter(Materia.id == Materia_valida.id).first()
+        
+        assert materia.nome_materia == "Português"
+        assert materia.id_professor == professor_novo.id
+        
     def test_update_materia_valida(self,db_session,Materia_valida):
         
         professor_novo =  Professor(nome="Rogério", email_institucional="rogerio@professor", senha="123")
@@ -68,25 +86,6 @@ class TestMateria: # Materia não tem insert próprio, fiz apenas testes para up
         materia = db_session.query(Materia).filter(Materia.id == Materia_valida.id).first()
         
         assert materia.nome_materia == "Calculo 1"
-        assert materia.id_professor == professor_novo.id
-        
-    def test_update_materia_trocar_professor(self, db_session, Materia_valida):
-        
-        db_session.expire_all() 
-        
-        professor_novo =  Professor(nome="Rogério", email_institucional="rogerio@professor", senha="123")
-        
-        db_session.add(professor_novo)
-        db_session.commit()
-        
-        AtualizarMateria(Materia_valida.id, Materia_valida.nome_materia, professor_novo.id)
-        
-          
-        db_session.expire_all() 
-        
-        materia = db_session.query(Materia).filter(Materia.id == Materia_valida.id).first()
-        
-        assert materia.nome_materia == "Português"
         assert materia.id_professor == professor_novo.id
     
     @pytest.mark.xfail(raises=IntegrityError, reason="Id é necessário")

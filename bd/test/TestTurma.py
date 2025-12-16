@@ -9,6 +9,10 @@ from ..update import AtualizarTurma
 
 import pytest
 
+
+# pytest test/ --html=relatorio.html --self-contained-html
+# para rodar todos os testes de um arquivo, e gerar um html para ele
+
 Session = sessionmaker(bind=engine)
 
 @pytest.fixture(scope="module") 
