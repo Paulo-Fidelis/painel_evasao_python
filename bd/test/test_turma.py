@@ -13,28 +13,6 @@ import pytest
 # pytest test/ --html=relatorio.html --self-contained-html
 # para rodar todos os testes de um arquivo, e gerar um html para ele
 
-Session = sessionmaker(bind=engine)
-
-@pytest.fixture(scope="module") 
-def db_session(): #  Cria uma sessão temporária do bd para os testes
-   
-    session = Session()
-    
-    yield session
-    #session.query(Turma).filter(Turma.nome_turma == "oi").delete()
-    session.rollback()
-    session.close()
-    
-@pytest.fixture(scope="module")
-def Turma_valida(db_session):
-    
-    turma_valida = Turma(nome_turma = "2º B")
-    
-    db_session.add(turma_valida)
-    db_session.commit()    
-    
-    return turma_valida
-
 class TestTurma:
     #Inserts testes
     def test_insert_turma_valida(self, db_session):
@@ -96,20 +74,3 @@ class TestTurma:
         except UnmappedInstanceError:
             raise
         
-  
-        
-        
-def verificar_banco():
-    """Função para verificar todas as turmas no banco"""
-    session = Session()
-    try:
-        todas_turmas = session.query(Turma).all()
-        print("\n=== TURMAS NO BANCO ===")
-        for turma in todas_turmas:
-            print(f"ID: {turma.id}, Nome: {turma.nome_turma}")
-        print("=======================\n")
-    finally:
-        session.close()
-
-# Chame antes/depois do teste
-verificar_banco()

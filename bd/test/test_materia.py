@@ -9,47 +9,6 @@ from ..delete import DeletarMatéria
 
 import pytest
     
-Session = sessionmaker(bind=engine)
-
-@pytest.fixture(scope="module") 
-def db_session(): # Cria uma sessão temporária do bd para os testes
-   
-    session = Session()
-    
-    yield session
-    #session.query(Turma).filter(Turma.nome_turma == "oi").delete()
-    session.rollback()
-    session.close()
-    
-@pytest.fixture(scope="module")
-def Turma_valida(db_session):
-    
-    turma_valida = Turma(nome_turma = "12º")
-    
-    db_session.add(turma_valida)
-    db_session.commit()    
-    
-    return turma_valida
-
-@pytest.fixture(scope="module")
-def Materia_valida(Turma_valida,db_session):
-    
-    professor_valido = Professor(nome="Lucas",email_institucional="lucas@professor",senha="123")
-    db_session.add(professor_valido)
-    db_session.commit()
-    
-    materia_valida = Materia(
-        nome_materia = "Português",
-        id_turma = Turma_valida.id,
-        id_professor = professor_valido.id
-    )
-    
-    db_session.add(materia_valida)
- 
-    db_session.commit()
-    
-    return materia_valida
-    
 class TestMateria: # Materia não tem insert próprio, fiz apenas testes para update e delete
     
     #Updates

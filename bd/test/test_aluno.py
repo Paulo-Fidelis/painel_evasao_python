@@ -8,44 +8,6 @@ from ..update import AtualizarAluno
 from ..delete import DeletarAluno
 
 import pytest
-    
-Session = sessionmaker(bind=engine)
-
-@pytest.fixture(scope="module") 
-def db_session(): # Cria uma sessão temporária do bd para os testes
-   
-    session = Session()
-    
-    yield session
-    #session.query(Turma).filter(Turma.nome_turma == "oi").delete()
-    session.rollback()
-    session.close()
- 
-# Especialmente criadas para os testes de update    
-@pytest.fixture(scope="module")
-def Turma_A(db_session):
-    turma = Turma(nome_turma="Turma A")
-    db_session.add(turma)
-    db_session.commit()
-    return turma
-
-@pytest.fixture(scope="module")
-def Turma_B(db_session):
-    turma = Turma(nome_turma="Turma B")
-    db_session.add(turma)
-    db_session.commit()
-    return turma   
-
-@pytest.fixture(scope="module")
-def Aluno_valido(db_session, Turma_A):
-    
-    aluno_valido = Aluno(nome = "Osvaldo", id_turma = Turma_A.id)
-    
-    db_session.add(aluno_valido)
-    db_session.commit()
-    
-    return aluno_valido
-    
 
 class TestAluno:
     
@@ -131,6 +93,7 @@ class TestAluno:
     @pytest.mark.xfail(raises=UnmappedInstanceError, reason="Id do aluno é obrigatório")    
     def test_delete_aluno_sem_id(self,db_session,Aluno_valido):
         DeletarAluno(None,Aluno_valido.nome)
+        
         
    
         

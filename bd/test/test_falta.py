@@ -10,76 +10,6 @@ from ..update import AtualizarFalta
 from datetime import datetime
 import pytest
 
-Session = sessionmaker(bind=engine)
-
-@pytest.fixture(scope="module") 
-def db_session(): #  Cria uma sessão temporária do bd para os testes
-   
-    session = Session()
-    
-    yield session
-    
-    session.rollback()
-    session.close()
-    
-@pytest.fixture(scope="module")
-def Turma_valida(db_session):
-    
-    turma_valida = Turma(nome_turma = "9º B")
-    
-    db_session.add(turma_valida)
-    db_session.commit()    
-    
-    return turma_valida
-
-@pytest.fixture(scope="module")
-def Aluno_valido(db_session, Turma_valida):
-    
-    aluno_valido = Aluno(nome = "Pedro", id_turma = Turma_valida.id)
-    
-    db_session.add(aluno_valido)
-    db_session.commit()
-    
-    return aluno_valido
-
-@pytest.fixture(scope="module")
-def Materia_valida(Turma_valida,db_session):
-    
-    professor_valido = Professor(nome="Lucas",email_institucional="lucas@professor",senha="123")
-    db_session.add(professor_valido)
-    db_session.commit()
-    
-    materia_valida = Materia(
-        nome_materia = "Português",
-        id_turma = Turma_valida.id,
-        id_professor = professor_valido.id
-    )
-    
-    db_session.add(materia_valida)
- 
-    db_session.commit()
-    
-    return materia_valida
-
-@pytest.fixture(scope="module")
-def Falta_valida(db_session, Aluno_valido, Materia_valida, Turma_valida):
-    
-    dataValida = datetime.strptime("2025-12-22", "%Y-%m-%d").date()
-    
-    falta_valida = Falta(
-        data_falta = dataValida, 
-        id_turma = Turma_valida.id,
-        id_aluno = Aluno_valido.id,
-        id_materia = Materia_valida.id
-    )
-    
-    db_session.add(falta_valida)
-    db_session.commit()
-    
-    return falta_valida
-    
-
-
 # Acredito que para Faltas, é necessário adicionar, na função de insert, uma dependência de qtd de faltas.
 
 class TestFalta: 
@@ -87,6 +17,8 @@ class TestFalta:
     # Insert tests
     
     def test_insert_Falta_valida(self, db_session, Aluno_valido, Materia_valida):
+        
+   
         
         dataValida = "2025-12-09"
         AdicionarFalta(dataValida, Aluno_valido.nome, Materia_valida.nome_materia)

@@ -7,50 +7,7 @@ from ..update import AtualizarProfessor
 from ..delete import DeletarProfessor
 
 import pytest
-    
-Session = sessionmaker(bind=engine)
-
-@pytest.fixture(scope="module") 
-def db_session(): # Cria uma sessão temporária do bd para os testes
-   
-    session = Session()
-    
-    yield session
-    #session.query(Turma).filter(Turma.nome_turma == "oi").delete()
-    session.rollback()
-    session.close()
-    
-@pytest.fixture(scope="module")
-def Turma_valida(db_session):
-    
-    turma_valida = Turma(nome_turma = "12º")
-    
-    db_session.add(turma_valida)
-    db_session.commit()    
-    
-    return turma_valida
-
-
-@pytest.fixture(scope="module")
-def Professor_valido(db_session, Turma_valida): # Feito para as defs de update 
-    
-    materia_valida = Materia(
-        nome_materia = "Matemática",
-        id_turma = Turma_valida.id
-    )
-    professor_valido = Professor(
-        nome = "Carlos",
-        email_institucional = "carlos@professor",
-        senha = "123",
-        materia = materia_valida
-    )
-    
-    db_session.add(professor_valido)
-    db_session.commit()
-    
-    return professor_valido
-  
-    
+     
 class TestProfessor:
     
     def test_insert_professor_valido(self,db_session,Turma_valida):
