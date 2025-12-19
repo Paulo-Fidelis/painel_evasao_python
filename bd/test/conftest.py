@@ -7,7 +7,7 @@ import pytest
 
 Session = sessionmaker(bind=engine)
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def db_session():
     """Sessão do banco de dados para cada teste"""
     session = Session()
@@ -16,7 +16,7 @@ def db_session():
     session.close()
 
 # Fixtures para entidades de teste
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Turma_valida(db_session): # posso colocar um parâmetro nome turma, para evitar ter 3 fixtures que fazem a mesma coisa
     """Cria uma turma válida para testes"""
     turma = Turma(nome_turma="teste turma")
@@ -24,21 +24,21 @@ def Turma_valida(db_session): # posso colocar um parâmetro nome turma, para evi
     db_session.commit()
     return turma
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Turma_A(db_session):
     turma = Turma(nome_turma="Turma A")
     db_session.add(turma)
     db_session.commit()
     return turma
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Turma_B(db_session):
     turma = Turma(nome_turma="Turma B")
     db_session.add(turma)
     db_session.commit()
     return turma 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Falta_valida(db_session, Aluno_valido, Materia_valida, Turma_valida):
     
     dataValida = datetime.strptime("2025-12-22", "%Y-%m-%d").date()
@@ -55,7 +55,7 @@ def Falta_valida(db_session, Aluno_valido, Materia_valida, Turma_valida):
     
     return falta_valida
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Professor_valido(db_session, Turma_valida): # Feito para as defs de update 
     
     materia_valida = Materia(
@@ -75,7 +75,7 @@ def Professor_valido(db_session, Turma_valida): # Feito para as defs de update
     return professor_valido
   
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Aluno_valido(db_session, Turma_valida):
     
     aluno_valido = Aluno(nome = "Osvaldo", id_turma = Turma_valida.id)
@@ -85,7 +85,7 @@ def Aluno_valido(db_session, Turma_valida):
     
     return aluno_valido
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def Materia_valida(Turma_valida,db_session):
     
     professor_valido = Professor(nome="Lucas",email_institucional="lucas@professor",senha="123")
