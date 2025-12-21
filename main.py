@@ -7,15 +7,24 @@ import os
 import requests
 from sqlalchemy.orm import Session
 
-
+# --- configurações e funções importantes
 from bd.tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
 from bd.inserts import (
     AdicionarTurma,
+    AdicionarAlunoComTurma,
     AdicionarProfessorComMatéria,
     AdicionarFalta,
 )
+from bd.update import (
+    AtualizarAluno,
+    AtualizarProfessor,
+    AtualizarTurma,
+    AtualizarFalta,
+    AtualizarMateria,
+)
 
 load_dotenv()
+
 
 ANYTHINGLLM_API_URL = "http://localhost:3001/api/v1"
 API_KEY = os.getenv("ANYTHING_LLM_API_KEY")
@@ -31,6 +40,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- modelos para busca ---
+
+
+class ProfessorResponse(BaseModel):
+    id: int
+    nome: str
+    email_institucional: str
+
+    class Config:
+        from_attributes = True
+
+
+class CadastroAluno(BaseModel):
+    nome: str
+    nome_turma: str
 
 
 class CadastroUsuario(BaseModel):
@@ -50,6 +75,24 @@ class FaltaModel(BaseModel):
     data: str
     nome_aluno: str
     nome_materia: str
+
+
+# --- rotas ---
+
+
+@app.post("/adicionarAluno")
+def adicionarAluno(user: CadastroAluno):
+    with Session(engine) as session:
+        turma = (
+            session.query(Turma.id).filter(Turma.nome_turma == user.nome_turma).first()
+        )
+
+        if not turma:
+            return {"mensagem": "essa turma não existe"}
+
+        AdicionarAlunoComTurma(nome=user.nome, id_turma=turma.id)
+
+    return {"mensagem": "Cadastro realizado com sucesso"}
 
 
 @app.get("/llmResponse/{prompt}")
@@ -84,7 +127,9 @@ def login(user: Login):
     if not professor:
         raise HTTPException(status_code=400, detail="Email ou senha incorretos")
 
-    return {"mensagem": "Login realizado com sucesso", "id_professor": professor.id}
+    professor_dados = ProfessorResponse.model_validate(professor)
+
+    return {"mensagem": "Login realizado com sucesso", "professor": professor_dados}
 
 
 @app.post("/cadastro")
