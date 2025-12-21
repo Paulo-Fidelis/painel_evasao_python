@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 import requests
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import date
 
 # --- configurações e funções importantes
 from bd.tabelas_do_bd import engine, Professor, Turma, Materia, Aluno, Falta
@@ -14,13 +16,6 @@ from bd.inserts import (
     AdicionarAlunoComTurma,
     AdicionarProfessorComMatéria,
     AdicionarFalta,
-)
-from bd.update import (
-    AtualizarAluno,
-    AtualizarProfessor,
-    AtualizarTurma,
-    AtualizarFalta,
-    AtualizarMateria,
 )
 
 load_dotenv()
@@ -78,6 +73,48 @@ class FaltaModel(BaseModel):
 
 
 # --- rotas ---
+
+
+@app.get("/alunos-professor/{id_professor}/{id_turma}")
+def listar_alunos_professor(id_professor: int, id_turma: int):
+    with Session(engine) as session:
+        materia = (
+            session.query(Materia)
+            .filter(Materia.id_professor == id_professor, Materia.id_turma == id_turma)
+            .first()
+        )
+
+        if not materia:
+            raise HTTPException(
+                status_code=403, detail="Professor não leciona nesta turma"
+            )
+
+        alunos = session.query(Aluno).filter(Aluno.id_turma == id_turma).all()
+
+        resposta = []
+
+        for aluno in alunos:
+            total_faltas = (
+                session.query(func.count(Falta.id))
+                .filter(Falta.id_aluno == aluno.id, Falta.id_materia == materia.id)
+                .scalar()
+            )
+
+            resposta.append(
+                {
+                    "id_aluno": aluno.id,
+                    "nome": aluno.nome,
+                    "nome_turma": aluno.turma.nome_turma,
+                    "faltas": total_faltas,
+                }
+            )
+
+    return {
+        "turma_id": id_turma,
+        "materia": materia.nome_materia,
+        "total_alunos": len(resposta),
+        "alunos": resposta,
+    }
 
 
 @app.post("/adicionarAluno")
